@@ -6,6 +6,10 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { toast } from "sonner";
 
+// ✅ Import backend API functions
+import { analyzeRegulation } from "@/api/analyze";
+import { uploadFile } from "@/api/upload";
+
 interface UploadProps {
   onAnalysisComplete: (data: any) => void;
 }
@@ -21,35 +25,36 @@ const Upload = ({ onAnalysisComplete }: UploadProps) => {
     }
 
     setIsLoading(true);
-    
-    // Simulate API call with mock data
-    setTimeout(() => {
-      const mockResponse = {
-        summary: "This regulation introduces a 15% tax on imported semiconductors in the US, affecting major technology companies with significant supply chain dependencies in Asia.",
-        sectors: ["Semiconductors", "Technology", "Manufacturing"],
-        companies: ["NVIDIA", "AMD", "Intel", "TSMC"],
-        risk_scores: [
-          { ticker: "NVDA", company: "NVIDIA", risk: 2, sector: "Semiconductors", comment: "High import dependency" },
-          { ticker: "AMD", company: "AMD", risk: 2, sector: "Semiconductors", comment: "Significant exposure" },
-          { ticker: "INTC", company: "Intel", risk: 1, sector: "Semiconductors", comment: "Domestic manufacturing" },
-          { ticker: "TSM", company: "TSMC", risk: 2, sector: "Semiconductors", comment: "Major supplier impact" },
-        ],
-        recommendations: [
-          "Reduce exposure to US semiconductor companies with high import dependency",
-          "Increase clean energy sector allocation as alternative growth opportunity",
-          "Diversify geographically toward EU markets with favorable trade policies",
-        ],
-      };
 
-      setIsLoading(false);
-      onAnalysisComplete(mockResponse);
+    try {
+      // 1️⃣ Send text to AWS Lambda (your deployed backend)
+      console.log("➡️ Sending text to AWS Lambda...");
+      const analysis = await analyzeRegulation(content);
+      console.log("✅ AWS Lambda analysis result:", analysis);
+
+      // 2️⃣ Upload the JSON result to S3 for storage
+      console.log("➡️ Uploading combined analysis to S3...");
+      const fileName = `analysis-${Date.now()}.json`;
+      const contentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(analysis, null, 2))));
+      const uploadResponse = await uploadFile(fileName, contentBase64);
+      console.log("✅ Upload response:", uploadResponse);
+
+      // 3️⃣ Pass result to the UI
+      onAnalysisComplete(analysis);
       toast.success("Analysis complete!");
-      
-      // Scroll to results
+
+      // 4️⃣ Smooth scroll to results
       setTimeout(() => {
-        document.getElementById("results-section")?.scrollIntoView({ behavior: "smooth" });
+        document
+          .getElementById("results-section")
+          ?.scrollIntoView({ behavior: "smooth" });
       }, 300);
-    }, 2500);
+    } catch (err) {
+      console.error("❌ Error during analysis or upload:", err);
+      toast.error("An error occurred during analysis or upload.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -67,7 +72,8 @@ const Upload = ({ onAnalysisComplete }: UploadProps) => {
               Upload Your Regulation
             </h2>
             <p className="text-lg text-muted-foreground">
-              Paste the regulatory text below or upload a document for AI-powered analysis.
+              Paste the regulatory text below or upload a document for
+              AI-powered analysis.
             </p>
           </div>
 
@@ -82,15 +88,15 @@ const Upload = ({ onAnalysisComplete }: UploadProps) => {
 
               {/* Textarea */}
               <Textarea
-                placeholder="Drop your regulation here or paste the content... 
+                placeholder={`Drop your regulation here or paste the content...
 
-Example: 'This regulation introduces a 15% tax on imported semiconductors effective Q2 2025...'"
+Example: "This regulation introduces a 15% tax on imported semiconductors effective Q2 2025..."`}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 className="min-h-[200px] text-base resize-none border-border focus:border-primary transition-colors"
               />
 
-              {/* File Upload Button */}
+              {/* File Upload Button (future feature) */}
               <div className="flex items-center justify-center gap-4">
                 <Button
                   variant="outline"
@@ -122,6 +128,7 @@ Example: 'This regulation introduces a 15% tax on imported semiconductors effect
                 )}
               </Button>
 
+              {/* Loading Indicator */}
               {isLoading && (
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -129,7 +136,7 @@ Example: 'This regulation introduces a 15% tax on imported semiconductors effect
                   className="text-center text-sm text-muted-foreground"
                 >
                   <p>Processing regulatory text with AWS Bedrock...</p>
-                  <p className="mt-1">Detecting entities with AWS Comprehend...</p>
+                  <p className="mt-1">Calculating financial impact...</p>
                 </motion.div>
               )}
             </div>
