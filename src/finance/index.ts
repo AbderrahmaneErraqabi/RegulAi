@@ -1,5 +1,5 @@
-const { computeTickerRisk } = require("./riskScore");
-const { buildSectorView, topLevelAction } = require("./suggestions");
+import { computeTickerRisk } from "./riskScore";
+import { buildSectorView, topLevelAction } from "./suggestions";
 
 /**
  * @typedef {import("./riskScore").RegulationInsight} RegulationInsight
@@ -12,13 +12,15 @@ const { buildSectorView, topLevelAction } = require("./suggestions");
  * @property {string} action
  */
 
-async function evaluateRegulatoryImpact(regInfo) {
+export async function evaluateRegulatoryImpact(regInfo: any) {
   const tickerRisk = await computeTickerRisk(regInfo);
   const sectorView = buildSectorView(tickerRisk);
   const action = topLevelAction(sectorView);
   return { per_ticker: tickerRisk, sector_summary: sectorView, action };
 }
 
+// Optional test demo — disable in production
+/*
 async function demo() {
   const demoReg = {
     keywords: ["carbon tax", "emission standard", "aviation"],
@@ -29,5 +31,5 @@ async function demo() {
   const res = await evaluateRegulatoryImpact(demoReg);
   console.log(JSON.stringify(res, null, 2));
 }
-
-demo();
+*/
+// demo();

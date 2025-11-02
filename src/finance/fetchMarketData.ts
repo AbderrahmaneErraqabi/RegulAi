@@ -1,4 +1,6 @@
-const yahooFinance = require("yahoo-finance2").default;
+// src/finance/fetchMarketData.ts
+
+import yahooFinance from "yahoo-finance2";  // ✅ ES Module import
 
 export interface MarketData {
   ticker: string;
@@ -19,10 +21,12 @@ export async function getMarketData(ticker: string): Promise<MarketData> {
       marketCap: quote.marketCap,
       beta: quote.beta,
       sector: quote.sector,
-      name: quote.longName || quote.shortName
+      name: quote.longName || quote.shortName,
     };
   } catch (err) {
     console.error("getMarketData error for", ticker, err);
     return { ticker };
   }
 }
+
+export default getMarketData; // ✅ Optional default export for compatibility

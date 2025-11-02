@@ -6,25 +6,17 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 
 interface AnalysisResultsProps {
-  data: {
-    summary: string;
-    sectors: string[];
-    companies: string[];
-    risk_scores: Array<{
-      ticker: string;
-      company: string;
-      risk: number;
-      sector: string;
-      comment: string;
-    }>;
-    recommendations: string[];
-  };
+  data: any;
 }
 
 const AnalysisResults = ({ data }: AnalysisResultsProps) => {
+  const tickers = data.finance?.tickers || [];
+  const sectorSummary = data.finance?.summary || [];
+  const action = data.finance?.action || "No action suggested.";
+
   const getRiskBadge = (risk: number) => {
-    if (risk === 0) return { label: "Low", variant: "default" as const, icon: TrendingUp };
-    if (risk === 1) return { label: "Medium", variant: "secondary" as const, icon: Minus };
+    if (risk < 0.3) return { label: "Low", variant: "default" as const, icon: TrendingUp };
+    if (risk < 0.6) return { label: "Medium", variant: "secondary" as const, icon: Minus };
     return { label: "High", variant: "destructive" as const, icon: TrendingDown };
   };
 
@@ -48,12 +40,13 @@ const AnalysisResults = ({ data }: AnalysisResultsProps) => {
           transition={{ duration: 0.6 }}
           className="max-w-5xl mx-auto"
         >
+          {/* Header */}
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4 text-foreground">
               Analysis Results
             </h2>
             <p className="text-lg text-muted-foreground">
-              AI-generated insights from your regulatory document
+              AI + Financial Insights from your Regulation
             </p>
           </div>
 
@@ -74,7 +67,7 @@ const AnalysisResults = ({ data }: AnalysisResultsProps) => {
                 Detected Sectors
               </h3>
               <div className="flex flex-wrap gap-3">
-                {data.sectors.map((sector, idx) => (
+                {(data.sectors || []).map((sector: string, idx: number) => (
                   <Badge
                     key={idx}
                     variant="secondary"
@@ -86,16 +79,34 @@ const AnalysisResults = ({ data }: AnalysisResultsProps) => {
               </div>
             </Card>
 
+            {/* Finance Summary */}
+            <Card className="p-8 bg-card shadow-md">
+              <h3 className="text-2xl font-semibold mb-6 text-card-foreground">
+                Sector Risk Overview
+              </h3>
+              <ul className="space-y-3">
+                {sectorSummary.map((s: any, idx: number) => (
+                  <li key={idx} className="flex justify-between border-b pb-2">
+                    <span className="font-medium">{s.sector}</span>
+                    <span className="text-muted-foreground">
+                      Risk {s.avgRisk} — {s.suggestion}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-4 text-primary font-medium">{action}</p>
+            </Card>
+
             {/* Impacted Companies */}
             <Card className="p-8 bg-card shadow-md">
               <h3 className="text-2xl font-semibold mb-6 text-card-foreground">
                 Impacted Companies
               </h3>
               <div className="grid sm:grid-cols-2 gap-4">
-                {data.risk_scores.map((item, idx) => {
-                  const riskInfo = getRiskBadge(item.risk);
+                {tickers.map((item: any, idx: number) => {
+                  const riskInfo = getRiskBadge(item.riskScore || 0);
                   const RiskIcon = riskInfo.icon;
-                  
+
                   return (
                     <motion.div
                       key={idx}
@@ -113,16 +124,21 @@ const AnalysisResults = ({ data }: AnalysisResultsProps) => {
                               <h4 className="font-semibold text-lg text-card-foreground">
                                 {item.ticker}
                               </h4>
-                              <p className="text-sm text-muted-foreground">{item.company}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {item.company}
+                              </p>
                             </div>
                           </div>
-                          <Badge variant={riskInfo.variant} className="flex items-center gap-1">
+                          <Badge
+                            variant={riskInfo.variant}
+                            className="flex items-center gap-1"
+                          >
                             <RiskIcon className="w-3 h-3" />
                             {riskInfo.label}
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground italic">
-                          {item.comment}
+                          {item.why || "General exposure to sector regulation"}
                         </p>
                       </Card>
                     </motion.div>

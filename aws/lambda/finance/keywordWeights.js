@@ -1,21 +1,14 @@
-// src/finance/keywordWeights.ts
+// aws/lambda/finance/keywordWeights.js
 
-export interface KeywordRule {
-  keyword: string;   
-  sector: string;    
-  weight: number;    
-  rationale: string; 
-}
-
-export const KEYWORD_RULES: KeywordRule[] = [
+const KEYWORD_RULES = [
   {
     keyword: "semiconductor",
     sector: "Information Technology",
     weight: 0.9,
-    rationale: "Restrictions sur puces / export GPU = pression sur revenus des fabricants de puces"
+    rationale: "Restrictions sur puces / GPU = pression sur revenus des fabricants de puces"
   },
   {
-    keyword: "export control",
+    keyword: "control",
     sector: "Information Technology",
     weight: 0.7,
     rationale: "Contrôle des exports haute technologie vers certains pays"
@@ -46,5 +39,4 @@ export const KEYWORD_RULES: KeywordRule[] = [
   }
 ];
 
-// ✅ Use ESM exports — no CommonJS needed
-export default KEYWORD_RULES;
+module.exports = { KEYWORD_RULES };

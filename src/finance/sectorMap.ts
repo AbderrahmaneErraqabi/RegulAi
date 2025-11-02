@@ -1,27 +1,29 @@
-export interface SP500Company {
-  ticker: string;
-  name: string;
+// src/finance/sectorMap.ts
+
+export interface SectorInfo {
   sector: string;
+  tickers: string[];
 }
 
-export const SP500_SAMPLE: SP500Company[] = [
-  { ticker: "AAPL", name: "Apple Inc.", sector: "Information Technology" },
-  { ticker: "MSFT", name: "Microsoft Corp.", sector: "Information Technology" },
-  { ticker: "NVDA", name: "NVIDIA Corp.", sector: "Information Technology" },
-
-  { ticker: "XOM",  name: "Exxon Mobil Corp.", sector: "Energy" },
-  { ticker: "CVX",  name: "Chevron Corp.", sector: "Energy" },
-
-  { ticker: "BA",   name: "Boeing Co.", sector: "Industrials" },
-  { ticker: "LMT",  name: "Lockheed Martin", sector: "Industrials" },
-
-  { ticker: "JPM",  name: "JPMorgan Chase & Co.", sector: "Financials" },
-  { ticker: "BAC",  name: "Bank of America Corp.", sector: "Financials" }
+// ✅ Sector mapping — defines which tickers belong to each sector
+export const SECTOR_MAP: SectorInfo[] = [
+  { sector: "Information Technology", tickers: ["AAPL", "MSFT", "NVDA", "AMD", "INTC", "TSM"] },
+  { sector: "Financials", tickers: ["JPM", "GS", "BAC", "C", "MS"] },
+  { sector: "Energy", tickers: ["XOM", "CVX", "BP", "TOT"] },
+  { sector: "Industrials", tickers: ["BA", "CAT", "GE", "HON"] },
+  { sector: "Consumer Discretionary", tickers: ["TSLA", "AMZN", "HD", "MCD"] },
+  { sector: "Healthcare", tickers: ["JNJ", "PFE", "MRK", "UNH"] },
+  { sector: "Utilities", tickers: ["NEE", "DUK", "SO", "EXC"] },
+  { sector: "Materials", tickers: ["LIN", "SHW", "APD"] },
+  { sector: "Communication Services", tickers: ["GOOGL", "META", "NFLX", "DIS"] },
+  { sector: "Real Estate", tickers: ["PLD", "AMT", "CCI"] }
 ];
 
-export function getTickersBySector(sector: string): string[] {
-  return SP500_SAMPLE
-    .filter(c => c.sector === sector)
-    .map(c => c.ticker);
-}
-module.exports = {};
+// ✅ Fallback sample of S&P 500 tickers if Yahoo Finance is unavailable
+export const SP500_SAMPLE = [
+  "AAPL", "MSFT", "AMZN", "GOOGL", "META",
+  "NVDA", "JPM", "TSLA", "UNH", "V", "PG", "XOM"
+];
+
+// ✅ Single correct default export
+export default SECTOR_MAP;
