@@ -2,9 +2,16 @@
 // Sends any text or JSON result to your Lambda uploadFile → saves it in S3
 
 export async function uploadFile(fileName: string, contentBase64: string) {
-  // 🔗 your actual API Gateway link:
-  const UPLOAD_URL =
+  // Allows overriding via Vite env var for production (falls back to current gateway)
+  const uploadEndpoint =
+    import.meta.env.VITE_UPLOAD_ENDPOINT?.trim() ||
     "https://5wb7jbcjhc.execute-api.us-west-2.amazonaws.com/default/uploadFile";
+
+  const UPLOAD_URL = uploadEndpoint.startsWith("http")
+    ? uploadEndpoint
+    : uploadEndpoint.startsWith("/")
+    ? uploadEndpoint
+    : `/${uploadEndpoint}`;
 
   const response = await fetch(UPLOAD_URL, {
     method: "POST",

@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { toast } from "sonner";
 
-// ✅ Import backend API functions
 import { analyzeRegulation } from "@/api/analyze";
 import { uploadFile } from "@/api/upload";
 
@@ -27,23 +26,28 @@ const Upload = ({ onAnalysisComplete }: UploadProps) => {
     setIsLoading(true);
 
     try {
-      // 1️⃣ Send text to AWS Lambda (your deployed backend)
-      console.log("➡️ Sending text to AWS Lambda...");
+      console.log("➡️ Sending text to AWS Lambda (Bedrock + Finance)...");
       const analysis = await analyzeRegulation(content);
-      console.log("✅ AWS Lambda analysis result:", analysis);
+      console.log("✅ Full normalized analysis for UI:", analysis);
 
-      // 2️⃣ Upload the JSON result to S3 for storage
-      console.log("➡️ Uploading combined analysis to S3...");
-      const fileName = `analysis-${Date.now()}.json`;
-      const contentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(analysis, null, 2))));
-      const uploadResponse = await uploadFile(fileName, contentBase64);
-      console.log("✅ Upload response:", uploadResponse);
-
-      // 3️⃣ Pass result to the UI
+      // Push data up to parent (App) so <AnalysisResults /> renders it immediately
       onAnalysisComplete(analysis);
       toast.success("Analysis complete!");
 
-      // 4️⃣ Smooth scroll to results
+      // Save report JSON to S3 (optional upload step you already wired)
+      const fileName = `analysis-${Date.now()}.json`;
+      const contentBase64 = btoa(
+        unescape(encodeURIComponent(JSON.stringify(analysis, null, 2)))
+      );
+      try {
+        const uploadResponse = await uploadFile(fileName, contentBase64);
+        console.log("✅ Upload response:", uploadResponse);
+      } catch (uploadErr) {
+        console.warn("⚠️ Upload to S3 failed (analysis still ready):", uploadErr);
+        toast.warning("Analysis ready, but saving the report to S3 failed.");
+      }
+
+      // Smooth scroll to results
       setTimeout(() => {
         document
           .getElementById("results-section")
@@ -79,7 +83,7 @@ const Upload = ({ onAnalysisComplete }: UploadProps) => {
 
           <Card className="p-8 bg-card shadow-lg">
             <div className="space-y-6">
-              {/* Upload Icon */}
+              {/* Icon */}
               <div className="flex items-center justify-center">
                 <div className="p-4 rounded-full bg-primary/10">
                   <FileText className="w-8 h-8 text-primary" />
@@ -96,7 +100,7 @@ Example: "This regulation introduces a 15% tax on imported semiconductors effect
                 className="min-h-[200px] text-base resize-none border-border focus:border-primary transition-colors"
               />
 
-              {/* File Upload Button (future feature) */}
+              {/* Upload button (not wired yet, fine) */}
               <div className="flex items-center justify-center gap-4">
                 <Button
                   variant="outline"
@@ -108,7 +112,7 @@ Example: "This regulation introduces a 15% tax on imported semiconductors effect
                 </Button>
               </div>
 
-              {/* Analyze Button */}
+              {/* Analyze button */}
               <Button
                 size="lg"
                 onClick={handleAnalyze}
@@ -128,15 +132,15 @@ Example: "This regulation introduces a 15% tax on imported semiconductors effect
                 )}
               </Button>
 
-              {/* Loading Indicator */}
+              {/* Loading text */}
               {isLoading && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="text-center text-sm text-muted-foreground"
                 >
-                  <p>Processing regulatory text with AWS Bedrock...</p>
-                  <p className="mt-1">Calculating financial impact...</p>
+                  <p>Processing text with AWS Bedrock...</p>
+                  <p className="mt-1">Calculating financial exposure...</p>
                 </motion.div>
               )}
             </div>
