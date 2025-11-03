@@ -6,17 +6,31 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 
 interface AnalysisResultsProps {
-  data: any;
+  data: {
+    summary: string;
+    sectors: string[];
+    companies: string[];
+    risk_scores: Array<{
+      ticker: string;
+      company: string;
+      risk: number;
+      sector: string;
+      comment: string;
+    }>;
+    recommendations: string[];
+    risk_level?: string;
+    timestamp?: string | null;
+  };
 }
 
 const AnalysisResults = ({ data }: AnalysisResultsProps) => {
-  const tickers = data.finance?.tickers || [];
-  const sectorSummary = data.finance?.summary || [];
-  const action = data.finance?.action || "No action suggested.";
-
   const getRiskBadge = (risk: number) => {
-    if (risk < 0.3) return { label: "Low", variant: "default" as const, icon: TrendingUp };
-    if (risk < 0.6) return { label: "Medium", variant: "secondary" as const, icon: Minus };
+    if (risk <= 0.3) {
+      return { label: "Low", variant: "default" as const, icon: TrendingUp };
+    }
+    if (risk <= 0.6) {
+      return { label: "Medium", variant: "secondary" as const, icon: Minus };
+    }
     return { label: "High", variant: "destructive" as const, icon: TrendingDown };
   };
 
@@ -46,8 +60,13 @@ const AnalysisResults = ({ data }: AnalysisResultsProps) => {
               Analysis Results
             </h2>
             <p className="text-lg text-muted-foreground">
-              AI + Financial Insights from your Regulation
+              AI-generated insights from your regulatory document
             </p>
+            {data.timestamp && (
+              <p className="text-xs text-muted-foreground mt-2">
+                Generated at {data.timestamp}
+              </p>
+            )}
           </div>
 
           <div className="space-y-6">
@@ -66,85 +85,106 @@ const AnalysisResults = ({ data }: AnalysisResultsProps) => {
               <h3 className="text-2xl font-semibold mb-4 text-card-foreground">
                 Detected Sectors
               </h3>
-              <div className="flex flex-wrap gap-3">
-                {(data.sectors || []).map((sector: string, idx: number) => (
-                  <Badge
-                    key={idx}
-                    variant="secondary"
-                    className="px-4 py-2 text-base bg-primary/10 text-primary hover:bg-primary/20"
-                  >
-                    {sector}
-                  </Badge>
-                ))}
-              </div>
+              {data.sectors.length === 0 ? (
+                <p className="text-muted-foreground text-sm italic">
+                  No sectors identified.
+                </p>
+              ) : (
+                <div className="flex flex-wrap gap-3">
+                  {data.sectors.map((sector, idx) => (
+                    <Badge
+                      key={idx}
+                      variant="secondary"
+                      className="px-4 py-2 text-base bg-primary/10 text-primary hover:bg-primary/20"
+                    >
+                      {sector}
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </Card>
 
-            {/* Finance Summary */}
-            <Card className="p-8 bg-card shadow-md">
-              <h3 className="text-2xl font-semibold mb-6 text-card-foreground">
-                Sector Risk Overview
-              </h3>
-              <ul className="space-y-3">
-                {sectorSummary.map((s: any, idx: number) => (
-                  <li key={idx} className="flex justify-between border-b pb-2">
-                    <span className="font-medium">{s.sector}</span>
-                    <span className="text-muted-foreground">
-                      Risk {s.avgRisk} — {s.suggestion}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-4 text-primary font-medium">{action}</p>
-            </Card>
-
-            {/* Impacted Companies */}
+            {/* Impacted Companies / Risk */}
             <Card className="p-8 bg-card shadow-md">
               <h3 className="text-2xl font-semibold mb-6 text-card-foreground">
                 Impacted Companies
               </h3>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {tickers.map((item: any, idx: number) => {
-                  const riskInfo = getRiskBadge(item.riskScore || 0);
-                  const RiskIcon = riskInfo.icon;
 
-                  return (
-                    <motion.div
-                      key={idx}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: idx * 0.1 }}
-                    >
-                      <Card className="p-6 border-2 hover:border-primary/50 transition-colors bg-card/50">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                              <Building2 className="w-5 h-5 text-primary" />
+              {data.risk_scores.length === 0 ? (
+                <p className="text-muted-foreground text-sm italic">
+                  No company-level financial exposure calculated.
+                </p>
+              ) : (
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {data.risk_scores.map((item, idx) => {
+                    const riskInfo = getRiskBadge(item.risk ?? 2);
+                    const RiskIcon = riskInfo.icon;
+
+                    return (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: idx * 0.1 }}
+                      >
+                        <Card className="p-6 border-2 hover:border-primary/50 transition-colors bg-card/50">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <Building2 className="w-5 h-5 text-primary" />
+                              </div>
+                              <div>
+                                <h4 className="font-semibold text-lg text-card-foreground">
+                                  {item.ticker}
+                                </h4>
+                                <p className="text-sm text-muted-foreground">
+                                  {item.company}
+                                </p>
+                              </div>
                             </div>
-                            <div>
-                              <h4 className="font-semibold text-lg text-card-foreground">
-                                {item.ticker}
-                              </h4>
-                              <p className="text-sm text-muted-foreground">
-                                {item.company}
-                              </p>
-                            </div>
+                            <Badge variant={riskInfo.variant} className="flex items-center gap-1">
+                              <RiskIcon className="w-3 h-3" />
+                              {riskInfo.label}
+                            </Badge>
                           </div>
-                          <Badge
-                            variant={riskInfo.variant}
-                            className="flex items-center gap-1"
-                          >
-                            <RiskIcon className="w-3 h-3" />
-                            {riskInfo.label}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground italic">
-                          {item.why || "General exposure to sector regulation"}
-                        </p>
-                      </Card>
-                    </motion.div>
-                  );
-                })}
-              </div>
+
+                          <p className="text-sm text-muted-foreground mb-2">
+                            <strong>Sector:</strong> {item.sector || "—"}
+                          </p>
+                          {typeof item.risk === "number" && (
+                            <p className="text-sm text-muted-foreground mb-2">
+                              <strong>Risk Score:</strong> {item.risk.toFixed(2)}
+                            </p>
+                          )}
+                          <p className="text-sm text-muted-foreground italic">
+                            {item.comment}
+                          </p>
+                        </Card>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              )}
+            </Card>
+
+            {/* Portfolio Guidance */}
+            <Card className="p-8 bg-card shadow-md">
+              <h3 className="text-2xl font-semibold mb-4 text-card-foreground">
+                Portfolio Guidance
+              </h3>
+              {data.recommendations.length === 0 ? (
+                <p className="text-muted-foreground text-sm italic">
+                  No portfolio guidance generated for this regulation.
+                </p>
+              ) : (
+                <ul className="list-disc pl-5 text-muted-foreground space-y-2">
+                  {data.recommendations.map((rec, idx) => (
+                    <li key={idx} className="text-sm leading-relaxed">
+                      {rec}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </Card>
 
             {/* Download Button */}

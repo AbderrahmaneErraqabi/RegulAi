@@ -12,6 +12,9 @@ import { useNavigate } from "react-router-dom";
 const Index = () => {
   const navigate = useNavigate();
   const [analysisData, setAnalysisData] = useState<any>(null);
+  const handleAnalysisComplete = (data: any) => {
+    setAnalysisData(data);
+  };
 
   return (
     <div className="min-h-screen">
@@ -35,7 +38,7 @@ const Index = () => {
       <div className="pt-16">
         <Hero />
         <Features />
-        <Upload onAnalysisComplete={setAnalysisData} />
+        <Upload onAnalysisComplete={handleAnalysisComplete} />
         
         {analysisData && (
           <>

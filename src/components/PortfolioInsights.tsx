@@ -7,9 +7,11 @@ interface PortfolioInsightsProps {
 }
 
 const PortfolioInsights = ({ data }: PortfolioInsightsProps) => {
-  // ✅ Use new backend structure
-  const tickers = data.finance?.tickers || [];
-  const sorted = [...tickers].sort((a, b) => b.riskScore - a.riskScore);
+  // ✅ Consume normalized risk scores from the frontend API layer
+  const riskScores = Array.isArray(data?.risk_scores) ? data.risk_scores : [];
+  const sorted = [...riskScores].sort(
+    (a, b) => (b.risk ?? 0) - (a.risk ?? 0)
+  );
 
   const getRiskLevel = (score: number) => {
     if (score < 0.3)
@@ -47,7 +49,8 @@ const PortfolioInsights = ({ data }: PortfolioInsightsProps) => {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {sorted.map((item: any, idx: number) => {
-              const risk = getRiskLevel(item.riskScore);
+              const riskValue = typeof item.risk === "number" ? item.risk : 0;
+              const risk = getRiskLevel(riskValue);
               const RiskIcon = risk.icon;
 
               return (
@@ -60,21 +63,24 @@ const PortfolioInsights = ({ data }: PortfolioInsightsProps) => {
                   <Card className="p-6 bg-card shadow-md border-l-4 border-primary/60 hover:border-primary transition-all duration-300">
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <h3 className="font-semibold text-lg">{item.ticker}</h3>
+                        <h3 className="font-semibold text-lg">
+                          {item.ticker || "N/A"}
+                        </h3>
                         <p className="text-sm text-muted-foreground">
-                          {item.company}
+                          {item.company || "Company detail unavailable"}
                         </p>
                       </div>
                       <RiskIcon className={`w-5 h-5 ${risk.color}`} />
                     </div>
                     <p className="text-sm text-muted-foreground mb-2">
-                      <strong>Sector:</strong> {item.sector}
+                      <strong>Sector:</strong>{" "}
+                      {item.sector || "Unknown sector"}
                     </p>
                     <p className="text-sm text-muted-foreground mb-2">
-                      <strong>Risk Score:</strong> {item.riskScore.toFixed(2)}
+                      <strong>Risk Score:</strong> {riskValue.toFixed(2)}
                     </p>
                     <p className="text-sm text-muted-foreground italic">
-                      {item.why || "General sector exposure"}
+                      {item.comment || "General sector exposure"}
                     </p>
                   </Card>
                 </motion.div>

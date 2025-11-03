@@ -10,11 +10,8 @@ const Hero = () => {
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
       {/* Gradient Background */}
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,hsl(250_70%_98%),hsl(270_50%_97%))]" />
-      
-      {/* Animated Grid Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(250_70%_55%_/_0.03)_1px,transparent_1px),linear-gradient(to_bottom,hsl(250_70%_55%_/_0.03)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
-      
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,hsl(250_70%_98%),hsl(270_50%_96%))]" />
+
       {/* Gradient Orbs */}
       <div className="absolute top-20 right-20 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse-glow" />
       <div className="absolute bottom-20 left-20 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: "1s" }} />
@@ -32,9 +29,9 @@ const Hero = () => {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-accent shadow-lg mb-8"
+            className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-primary to-accent shadow-lg mb-8"
           >
-            <Brain className="w-10 h-10 text-white" />
+            <Brain className="w-12 h-12 text-white" />
           </motion.div>
 
           {/* Title */}
