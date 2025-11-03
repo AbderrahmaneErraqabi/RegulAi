@@ -1,73 +1,47 @@
-# Welcome to your Lovable project
+# ⚖️ RegulAI — Turning Regulation into Financial Strategy  
 
-## Project info
+[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel)](https://regul-ai.vercel.app/)
+[![AWS](https://img.shields.io/badge/Powered%20by-AWS%20Bedrock-orange?logo=amazonaws)](https://aws.amazon.com/bedrock/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**URL**: https://lovable.dev/projects/5cf645fa-c735-4ae3-957a-73573fb053c7
+---
 
-## How can I edit this code?
+## 🌍 Overview  
 
-There are several ways of editing your application.
+**RegulAI** is an AI-powered financial intelligence platform that interprets regulatory texts and quantifies their impact on global markets.  
+It uses **AWS Bedrock (Claude 3 Haiku)** for language understanding and a custom **financial Lambda** to identify affected sectors, companies, and risk exposure — turning regulation into investment strategy.  
 
-**Use Lovable**
+🚀 **Live Demo:** [regul-ai.vercel.app](https://regul-ai.vercel.app)  
+🧠 **Built for:** PolyFinances Datathon 2025  
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/5cf645fa-c735-4ae3-957a-73573fb053c7) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## ✨ Features  
 
-**Use your preferred IDE**
+- 🧩 **AI-Powered Legal Analysis** — Automatically summarizes and extracts key sectors, companies, and risks.  
+- 💹 **Financial Exposure Mapping** — Calculates risk across S&P 500 tickers using market data.  
+- ⚙️ **Actionable Insights** — Generates sector-level recommendations for portfolio adjustments.  
+- ☁️ **Serverless Cloud Architecture** — Fully hosted on **AWS Lambda + API Gateway + Bedrock**, with a React frontend on **Vercel**.  
+- 💾 **S3 Report Storage** — Exports complete JSON reports for documentation and auditing.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🏗️ Architecture  
+**Workflow:**  
+1. User pastes or uploads regulatory text.  
+2. The AI Lambda (Claude 3 Haiku) extracts sectors, companies, and risk level.  
+3. The Finance Lambda runs exposure analysis for relevant tickers.  
+4. Results are merged, visualized, and saved to S3.
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🖥️ Tech Stack  
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+| Layer | Technologies |
+|--------|---------------|
+| **Frontend** | React 18, TypeScript, Vite, Tailwind CSS, ShadCN UI, Framer Motion |
+| **Backend** | AWS Lambda (Node.js 20 & Python 3.11), AWS Bedrock, Yahoo Finance API |
+| **Cloud Services** | API Gateway, S3, CloudWatch |
+| **Deployment** | Vercel (frontend) + AWS (backend) |
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/5cf645fa-c735-4ae3-957a-73573fb053c7) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+---
