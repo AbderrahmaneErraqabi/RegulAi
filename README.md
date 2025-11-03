@@ -26,6 +26,7 @@ It uses **AWS Bedrock (Claude 3 Haiku)** for language understanding and a custom
 
 ---
 
+
 ## 🏗️ Architecture  
 **Workflow:**  
 1. User pastes or uploads regulatory text.  
@@ -45,3 +46,4 @@ It uses **AWS Bedrock (Claude 3 Haiku)** for language understanding and a custom
 | **Deployment** | Vercel (frontend) + AWS (backend) |
 
 ---
+
