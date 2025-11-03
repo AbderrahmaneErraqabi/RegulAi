@@ -106,13 +106,13 @@ function inferRiskScore({
 
 export async function analyzeRegulation(text: string) {
   const analyzeEndpoint =
-    import.meta.env.VITE_ANALYZE_ENDPOINT?.trim() ||
-    "/default/analyzeRegulationAI";
+    import.meta.env.VITE_ANALYZE_ENDPOINT?.trim() || "/api/analyze";
   const API_URL = analyzeEndpoint.startsWith("http")
     ? analyzeEndpoint
     : analyzeEndpoint.startsWith("/")
     ? analyzeEndpoint
     : `/${analyzeEndpoint}`;
+  console.info("[ENV] analyze endpoint =", API_URL);
 
   console.log("🚀 Sending text to Bedrock Lambda:", text.slice(0, 80));
   console.log(JSON.stringify({ text }));
