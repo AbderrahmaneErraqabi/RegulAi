@@ -6,6 +6,7 @@ import Upload from "@/components/Upload";
 import AnalysisResults from "@/components/AnalysisResults";
 import PortfolioInsights from "@/components/PortfolioInsights";
 import Architecture from "@/components/Architecture";
+import DemoVideo from "@/components/DemoVideo";
 import Footer from "@/components/Footer";
 import { useNavigate } from "react-router-dom";
 
@@ -39,6 +40,7 @@ const Index = () => {
         <Hero />
         <Features />
         <Upload onAnalysisComplete={handleAnalysisComplete} />
+        <DemoVideo />
         
         {analysisData && (
           <>

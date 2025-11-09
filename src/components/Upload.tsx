@@ -1,13 +1,21 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Upload as UploadIcon, FileText, Loader2, Brain } from "lucide-react";
+import {
+  Upload as UploadIcon,
+  FileText,
+  Loader2,
+  Brain,
+  PlayCircle,
+  AlertTriangle,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { analyzeRegulation } from "@/api/analyze";
 import { uploadFile } from "@/api/upload";
+import { DEMO_VIDEO_URL, IS_DEMO_MODE } from "@/config/demo";
 
 interface UploadProps {
   onAnalysisComplete: (data: any) => void;
@@ -16,8 +24,24 @@ interface UploadProps {
 const Upload = ({ onAnalysisComplete }: UploadProps) => {
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const scrollToDemoVideo = () => {
+    const section = document.getElementById("demo-video-section");
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+    } else {
+      window.open(DEMO_VIDEO_URL, "_blank", "noopener,noreferrer");
+    }
+  };
 
   const handleAnalyze = async () => {
+    if (IS_DEMO_MODE) {
+      toast.info(
+        "The live AI pipeline is offline. Scroll down to watch the recorded demo instead."
+      );
+      scrollToDemoVideo();
+      return;
+    }
+
     if (!content.trim()) {
       toast.error("Please enter or upload regulatory content");
       return;
@@ -83,6 +107,27 @@ const Upload = ({ onAnalysisComplete }: UploadProps) => {
 
           <Card className="p-8 bg-card shadow-lg">
             <div className="space-y-6">
+              {IS_DEMO_MODE && (
+                <div className="rounded-2xl border border-dashed border-primary/40 bg-primary/5 p-5 text-center space-y-3">
+                  <div className="flex items-center justify-center gap-2 text-primary font-semibold">
+                    <AlertTriangle className="w-4 h-4" />
+                    <span>Bedrock access is paused for the PolyFinances Datathon.</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground max-w-xl mx-auto">
+                    Watch the recorded flow below while we wait for AWS access to be restored.
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border border-primary/50"
+                    onClick={scrollToDemoVideo}
+                  >
+                    <PlayCircle className="w-4 h-4 mr-2" />
+                    Watch Demo Video
+                  </Button>
+                </div>
+              )}
+
               {/* Icon */}
               <div className="flex items-center justify-center">
                 <div className="p-4 rounded-full bg-primary/10">
@@ -119,7 +164,12 @@ Example: "This regulation introduces a 15% tax on imported semiconductors effect
                 disabled={isLoading}
                 className="w-full bg-gradient-to-r from-primary to-accent hover:shadow-lg transition-all duration-300"
               >
-                {isLoading ? (
+                {IS_DEMO_MODE ? (
+                  <>
+                    <PlayCircle className="w-5 h-5 mr-2" />
+                    View Demo Experience
+                  </>
+                ) : isLoading ? (
                   <>
                     <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                     Analyzing Regulation...
@@ -133,7 +183,7 @@ Example: "This regulation introduces a 15% tax on imported semiconductors effect
               </Button>
 
               {/* Loading text */}
-              {isLoading && (
+              {isLoading && !IS_DEMO_MODE && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
