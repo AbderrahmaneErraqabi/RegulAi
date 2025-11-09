@@ -1,10 +1,14 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Brain } from "lucide-react";
+import { ArrowRight, Brain, PlayCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
 const Hero = () => {
   const scrollToUpload = () => {
     document.getElementById("upload-section")?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const scrollToDemoVideo = () => {
+    document.getElementById("demo-video-section")?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -43,19 +47,30 @@ const Hero = () => {
             Turning Regulation into Financial Strategy
           </p>
           
-          <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
             Analyze global regulations, assess risk exposure, and adapt your portfolio instantly with AI-powered insights.
           </p>
 
-          {/* CTA Button */}
-          <Button
-            size="lg"
-            onClick={scrollToUpload}
-            className="group bg-gradient-to-r from-primary to-accent hover:shadow-lg hover:scale-105 transition-all duration-300 text-lg px-8 py-6"
-          >
-            Upload a Regulation
-            <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-          </Button>
+          {/* CTA Buttons */}
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <Button
+              size="lg"
+              onClick={scrollToUpload}
+              className="group bg-gradient-to-r from-primary to-accent hover:shadow-lg hover:scale-105 transition-all duration-300 text-lg px-8 py-6"
+            >
+              Upload a Regulation
+              <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={scrollToDemoVideo}
+              className="border-2 text-primary border-primary/50 hover:bg-primary/10"
+            >
+              <PlayCircle className="w-5 h-5 mr-2" />
+              Watch Demo Video
+            </Button>
+          </div>
 
           {/* Stats or Trust Indicators */}
           <motion.div

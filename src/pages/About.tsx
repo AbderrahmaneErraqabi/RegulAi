@@ -9,11 +9,119 @@ const About = () => {
   const navigate = useNavigate();
 
   const teamMembers = [
-    { name: "Team Member 1", role: "AI Engineer", expertise: "AWS Bedrock & NLP" },
-    { name: "Team Member 2", role: "Financial Analyst", expertise: "Portfolio Strategy" },
-    { name: "Team Member 3", role: "Full-Stack Developer", expertise: "React & Cloud" },
-    { name: "Team Member 4", role: "Data Scientist", expertise: "Machine Learning" },
+    {
+      name: "Abderrahmane Er-Raqabi",
+      role: "Electrical Engineer",
+      expertise: "Architects the Bedrock-powered AI workflow and keeps the power-systems rigor behind every inference.",
+      photo: "/Abderrhmane.png",
+    },
+    {
+      name: "Mohamed Amine Amroun",
+      role: "Software Engineer",
+      expertise: "Builds the serverless stack (API Gateway + Lambda) and the front-end that surfaces real-time insights.",
+    },
+    {
+      name: "Mohamed Amine Chakhari",
+      role: "Electrical Engineer",
+      expertise: "Transforms regulatory signals into structured data pipelines and market-impact features.",
+      photo: "/Chakhari.png",
+    },
+    {
+      name: "Badr El Moustafid",
+      role: "Aerospace Engineer",
+      expertise: "Applies control-systems discipline to portfolio simulations, stress tests, and risk scoring.",
+    },
   ];
+
+  const architectureFlow = [
+    {
+      title: "1. User Interface (RegulAI Web App)",
+      description:
+        "React/Vite single-page experience where analysts paste regulations or upload documents before triggering the workflow.",
+      bullets: [
+        "Validates inputs client-side and streams status updates to keep users informed.",
+        "Calls `POST /analyze-regulation` with the full text plus metadata such as source, jurisdiction, and language.",
+      ],
+    },
+    {
+      title: "2. API & Orchestration (API Gateway + Lambda)",
+      description:
+        "AWS API Gateway fronts the serverless backend. The `analyzeRegulation` Lambda sanitizes payloads, stores raw files in S3, and sequences every downstream service call.",
+      bullets: [
+        "Ensures idempotent requests and logs trace IDs for observability.",
+        "Persists raw regulations under `s3://regulations/raw/{id}.txt` for auditability.",
+      ],
+    },
+    {
+      title: "3. AI Understanding (AWS Bedrock + Comprehend)",
+      description:
+        "Bedrock handles summarization, tone detection, and impact classification, while Comprehend extracts fine-grained entities (ORG, GPE, MONEY, DATE).",
+      bullets: [
+        "Bedrock prompt frames the regulation context and requests a structured JSON payload (summary, sectors, impact type, tone).",
+        "Comprehend's entity list feeds the downstream market data lookup.",
+      ],
+    },
+    {
+      title: "4. Market Data Enrichment (Yahoo Finance API)",
+      description:
+        "Detected companies and sectors are matched to tickers, then enriched with live pricing, volatility, and market-cap metrics.",
+      bullets: [
+        "Supports S&P 500 mapping plus custom portfolios.",
+        "Normalizes responses into a canonical security schema consumed by the portfolio engine.",
+      ],
+    },
+    {
+      title: "5. Portfolio Analytics Engine",
+      description:
+        "Custom scoring logic combines AI output, market data, and portfolio weights to quantify regulatory risk and craft recommendations.",
+      bullets: [
+        "Calculates sector exposure deltas, company-level risk (0–1), and hedging guidance.",
+        "Returns actionable insights to the frontend and archives snapshots for longitudinal analysis.",
+      ],
+    },
+    {
+      title: "6. Insights & Visualization (Frontend + QuickSight)",
+      description:
+        "The React UI highlights immediate insights, while AWS QuickSight connects to curated S3/Redshift datasets for rich BI dashboards.",
+      bullets: [
+        "Dashboards track risk trends, compare scenarios, and surface top exposed holdings.",
+        "Supports jury/client demos with enterprise-ready visualizations.",
+      ],
+    },
+  ];
+
+  const architectureJson = {
+    frontend: {
+      tech: "React/Vite",
+      actions: ["upload_regulation", "view_insights"],
+    },
+    api_layer: {
+      gateway: "AWS API Gateway",
+      lambdas: ["analyzeRegulation", "storeAnalytics"],
+    },
+    ai: {
+      bedrock: {
+        task: "summarization + classification",
+        output: ["summary", "sectors_hint", "impact_type", "tone"],
+      },
+      comprehend: {
+        task: "entity_extraction",
+        entities: ["ORG", "GPE", "PERCENT", "MONEY", "DATE"],
+      },
+    },
+    market_data: {
+      source: "Yahoo Finance API",
+      usage: ["get_price", "sector_info", "volatility"],
+    },
+    portfolio_engine: {
+      inputs: ["ai_output", "market_data", "portfolio_weights"],
+      outputs: ["company_risks", "sector_exposure", "recommendations"],
+    },
+    analytics: {
+      storage: "S3",
+      bi_tool: "AWS QuickSight",
+    },
+  };
 
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,hsl(250_70%_98%),hsl(270_50%_97%))]">
@@ -105,9 +213,21 @@ const About = () => {
                   transition={{ delay: idx * 0.1 }}
                   className="text-center"
                 >
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-accent mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold">
-                    {member.name.charAt(0)}
-                  </div>
+                  {member.photo ? (
+                    <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border border-border shadow-sm bg-muted">
+                      <img
+                        src={member.photo}
+                        alt={member.name}
+                        className="w-full h-full object-cover object-center"
+                        style={member.objectPosition ? { objectPosition: member.objectPosition } : undefined}
+                        loading="lazy"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-accent mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold">
+                      {member.name.charAt(0)}
+                    </div>
+                  )}
                   <h4 className="font-semibold text-lg text-card-foreground mb-1">
                     {member.name}
                   </h4>
@@ -118,23 +238,60 @@ const About = () => {
             </div>
           </Card>
 
-          {/* Architecture Diagram Placeholder */}
+          {/* Architecture Section */}
           <Card className="p-8 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
-            <h3 className="text-3xl font-bold mb-6 text-center text-card-foreground">
+            <h3 className="text-3xl font-bold mb-4 text-center text-card-foreground">
               System Architecture
             </h3>
-            <div className="bg-card rounded-lg p-12 border-2 border-dashed border-border flex items-center justify-center min-h-[400px]">
-              <div className="text-center">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 mx-auto mb-6 flex items-center justify-center">
-                  <Zap className="w-12 h-12 text-primary" />
+            <p className="text-center text-muted-foreground max-w-3xl mx-auto">
+              From the moment a regulation is uploaded to the instant portfolio recommendations and dashboards are refreshed,
+              RegulAI runs through a tightly orchestrated, fully serverless pipeline. The overview below mirrors the diagram used in our
+              Architecture section and investor materials.
+            </p>
+
+            <div className="mt-10 space-y-6">
+              {architectureFlow.map((stage, idx) => (
+                <div
+                  key={stage.title}
+                  className="bg-card border border-border rounded-2xl p-6 shadow-sm"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center text-primary font-semibold">
+                      {idx + 1}
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-semibold text-card-foreground mb-2">
+                        {stage.title}
+                      </h4>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {stage.description}
+                      </p>
+                      <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                        {stage.bullets.map((bullet) => (
+                          <li key={bullet}>{bullet}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-xl font-semibold text-muted-foreground mb-2">
-                  Architecture Diagram
-                </p>
-                <p className="text-sm text-muted-foreground max-w-md">
-                  AWS Bedrock → AWS Comprehend → Yahoo Finance API → AWS QuickSight → Portfolio Insights
-                </p>
+              ))}
+            </div>
+
+            <div className="mt-10 bg-card border border-dashed border-border rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                  <Zap className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h4 className="text-lg font-semibold text-card-foreground">Codex-Friendly Snapshot</h4>
+                  <p className="text-xs text-muted-foreground">
+                    JSON contract used by the dev team, LLM prompts, and diagramming tools.
+                  </p>
+                </div>
               </div>
+              <pre className="text-xs bg-muted/40 rounded-xl p-4 overflow-x-auto">
+{JSON.stringify(architectureJson, null, 2)}
+              </pre>
             </div>
           </Card>
         </div>
